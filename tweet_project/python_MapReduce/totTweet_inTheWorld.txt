@@ -1,0 +1,25 @@
+Time Zone 0  Numero tweet 437678
+Time Zone 1  Numero tweet 87705
+Time Zone 2  Numero tweet 66544
+Time Zone 3  Numero tweet 11884
+Time Zone 4  Numero tweet 37301
+Time Zone 5  Numero tweet 4184
+Time Zone 6  Numero tweet 409830
+Time Zone 7  Numero tweet 168193
+Time Zone 8  Numero tweet 1675343
+Time Zone 9  Numero tweet 50385
+Time Zone 10  Numero tweet 783
+Time Zone 11  Numero tweet 13203
+Time Zone 12  Numero tweet 1339
+Time Zone 13  Numero tweet 1186
+Time Zone 14  Numero tweet 11275
+Time Zone 15  Numero tweet 506140
+Time Zone 16  Numero tweet 193665
+Time Zone 17  Numero tweet 951545
+Time Zone 18  Numero tweet 253237
+Time Zone 19  Numero tweet 913851
+Time Zone 20  Numero tweet 1217280
+Time Zone 21  Numero tweet 556793
+Time Zone 22  Numero tweet 1184406
+Time Zone 23  Numero tweet 4681
+Tweet totali:  8758431

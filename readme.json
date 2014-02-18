@@ -1,0 +1,62 @@
+{
+ "name": "Sports",
+ "size": 5000,
+ "group": 1,
+ "children": [
+  {
+   "name": "Association football",
+   "size": 30,
+   "group": 2,
+   "children": [
+      {"name": "Gigio", "size": 900, "group": 2},
+      {"name": "Castro", "size": 1500, "group": 2},
+      {"name": "Minchio", "size": 600,"group": 5, "group": 2},
+      {"name": "zungku", "size": 400, "group": 2}
+   ]
+  },
+  {
+   "name": "Dance",
+   "size": 100,
+   "group": 3,
+   "children": [
+      {"name": "Gigio", "size": 900, "group": 3},
+      {"name": "Castro", "size": 1500, "group": 3},
+      {"name": "Minchio", "size": 600, "group": 3},
+      {"name": "zungku", "size": 400, "group": 3}
+   ]
+  },
+  {
+   "name": "Dance",
+   "size": 100,
+   "group": 4,
+   "children": [
+      {"name": "Gigio", "size": 900, "group": 4},
+      {"name": "Castro", "size": 1500, "group": 4},
+      {"name": "Minchio", "size": 600, "group": 4},
+      {"name": "zungku", "size": 400, "group": 4}
+   ]
+  },
+  {
+   "name": "Dance",
+   "size": 100,
+   "group": 5,
+   "children": [
+      {"name": "Gigio", "size": 900, "group": 5},
+      {"name": "Castro", "size": 1500, "group": 5},
+      {"name": "Minchio", "size": 600, "group": 5},
+      {"name": "zungku", "size": 400, "group": 5}
+   ]
+  },
+  {
+   "name": "Dance",
+   "size": 100,
+   "group": 6,
+   "children": [
+      {"name": "Gigio", "size": 900, "group": 6},
+      {"name": "Castro", "size": 1500, "group": 6},
+      {"name": "Minchio", "size": 600, "group": 6},
+      {"name": "zungku", "size": 400, "group": 6}
+   ]
+  }
+ ]
+}

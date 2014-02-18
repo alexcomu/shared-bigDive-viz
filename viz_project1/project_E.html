@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<head>
+	<script src="d3.v3.min.js"></script>
+	<title>Project1!</title>
+	<style type="text/css">
+
+		 
+	</style>
+</head>
+<body>
+	<script>
+		
+		/*  
+				************ GESTIONE GRAFICA INIZIALE **************
+		*/
+
+
+		var body = d3.select('body');
+		var svg = body.append('svg')
+					.attr('width', document.width)
+					.attr('height', 5000)
+					.style('background-color', '#231F20')
+					.style('font-family', 'sans-serif')
+					.style('font-stretch', 'narrow')
+					.style('font-size', 11)
+					//.append('g')
+
+		var countriesRect = svg.append('g')
+			.attr('id', 'countriesGroup')
+		var sportsRect = svg.append('g')				
+			.attr('id', 'sportsGroup')
+			.attr('transform','translate(300,100)')
+
+		var new_data = []
+		var temp_data = []
+
+
+		/*  
+				********** END - GESTIONE GRAFICA INIZIALE ************
+		*/
+
+
+
+		d3.csv('olympics.csv' , function(data){
+
+			//  **************** Mappiamo la nuova struttura dati, tolgo chi non ha vinto medaglie **************
+			data.map(function(d) { 
+				if(d["Medals"] == 'YES'){
+					temp_data.push(d)
+				};
+			})
+			//console.log(temp_data)
+			
+			//devo verificare quali hanno piu di 15 medaglie in totale
+			var h = new Object(); //h mi fa da HashTable (Chiave -country- -> Valore -N_medaglie_Tot-)
+			//conto le medagli per ogni stato
+			for(i=0;i<temp_data.length;i++){
+				//console.log(new_data[i].Country)
+				if(!h[temp_data[i].Country]){
+					h[temp_data[i].Country] = 0
+				}
+				h[temp_data[i].Country] += ((temp_data[i].Gold != '') ? parseInt(temp_data[i].Gold) : 0) + ((temp_data[i].Silver != '') ? parseInt(temp_data[i].Silver) : 0) + ((temp_data[i].Bronze != '') ? parseInt(temp_data[i].Bronze ): 0)
+			}
+			//console.log(h)
+
+			// a questo punto dentro h ho le ricorrenze per ogni stato
+			//salvo in new_data solo gli atleti che appartengono a stati che hanno vinto almeno 15 medaglie 
+			for(i=0;i<temp_data.length;i++){
+				if(h[temp_data[i].Country] > 0)
+					new_data.push(temp_data[i])
+			}
+
+
+
+			/*
+				******* Funzioni dedicate al calcolo delle medaglie *********
+			*/
+
+			function sumGold(d){
+				return d3.round(d3.sum(d, function(prp){
+					return (prp.Gold != '') ? prp.Gold : 0
+				}))
+			}
+			function sumSilver(d){
+				return d3.round(d3.sum(d, function(prp){
+					return (prp.Silver != '') ? prp.Silver : 0
+				}))
+			}
+			function sumBronze(d){
+				return d3.round(d3.sum(d, function(prp){
+					return (prp.Bronze != '') ? prp.Bronze : 0
+				}))
+			}
+			function sumTotal(d){
+				return sumBronze(d) + sumSilver(d) + sumGold(d)
+			}
+
+
+			/*  
+				************ STRUTTURA DATI PER GLI STATI **************
+			*/
+
+
+			var rollup_data = d3.nest()
+						.key(function(d){
+							return d.Country
+						})
+						/*.key(function(d){
+							return d.Sport
+						})
+						.key(function(d){
+							return d.Age
+						}) */
+						.rollup(function(d){
+							return {
+								gold: sumGold(d),
+								silver: sumSilver(d),
+								bronze: sumBronze(d),
+								total: sumTotal(d),
+								atleti: d //creo un array di atleti
+								//ha senso aggiungere un array per gli sport..?il problema è che ora abbiamo come chiave country..come possiamo fare per avere un array
+							}
+						})
+						.entries(new_data);
+			console.log("rollup_data")			
+
+			console.log(rollup_data)			
+
+			//  ************* Ordino i dati secondo il numero delle medaglie totali ***********
+			rollup_data.sort(function(a, b){
+                        if(a.values.total == b.values.total) return 0;
+
+                        if(a.values.total < b.values.total) return 1;
+
+                        if(a.values.total > b.values.total) return -1;
+                })
+
+			//a questo punto dentro rollup_data ho per ogni country l'elenco delle medaglie e degli atleti!
+			m_percountry = []
+			for(i=0;i<rollup_data.length;i++)
+				m_percountry.push(rollup_data[i].values.total)
+			//console.log("m_percountry")
+			//console.log(m_percountry)
+
+
+			/*  
+				********** END - STRUTTURA DATI PER GLI STATI ************
+			*/
+
+
+			/*  
+				********** END - STRUTTURA DATI PER GLI SPORT ************
+			*/
+
+
+			var sportsData = d3.nest()
+						.key(function(d){
+							return d.Sport
+						})
+
+			.rollup(function(d){
+							return {
+								gold: sumGold(d),
+								silver: sumSilver(d),
+								bronze: sumBronze(d),
+								total: sumTotal(d),
+								atleti: d //creo un array di atleti
+								//ha senso aggiungere un array per gli sport..?il problema è che ora abbiamo come chiave country..come possiamo fare per avere un array
+							}
+						})
+						.entries(new_data);		
+			console.log("Sports Data")
+			console.log(sportsData);				
+
+
+
+
+			/*				
+			var sports = new Object();
+			var contasport = 0
+			for(i=0;i<new_data.length;i++){
+				if(!sports[new_data[i].Sport]){
+					sports[new_data[i].Sport] = 0
+					contasport += 1
+				}
+				sports[new_data[i].Sport] += 1
+			}
+
+			console.log("Sports")
+			console.log(sports)
+			console.log(contasport)
+
+			for (i in sports) {
+ 				console.log(i)
+			}
+
+			*/
+
+
+
+			/*m_pertype = []
+			for(i=0;i<rollup_data.length;i++){
+				m_pertype.push(rollup_data[i].values.gold)
+				m_pertype.push(rollup_data[i].values.silver)
+				m_pertype.push(rollup_data[i].values.bronze)
+			}
+			console.log(m_pertype.length) */
+
+			var mapx = d3.scale.linear()
+						.domain([0, 11])
+						//.range([parseFloat(a[10]), parseFloat(a[0])])
+						.range([0,40])
+
+			/*
+				************* Disegnamo la parte superiore ****************
+			*/
+
+
+
+			var myGroup = d3.select('#countriesGroup').selectAll('rect')  //var myGroup = svg.selectAll('rect')
+				.data(rollup_data)
+				.enter()
+				.append('g')
+
+
+			//nomi stati
+			myGroup.append('text')
+				.text(function(d){
+					return d.key.toUpperCase()
+				})
+				.attr('transform' , function(d,i){
+					var s = 'translate('
+					temp = 30
+					for(j=0;j<i;j++){
+						temp += m_percountry[j]
+					}
+					temp+= d.values.total/2
+					s += mapx(temp) + ',40)'
+					return s
+				})
+				.style('fill', '#E6E6E6')
+				.style('text-anchor', 'middle')
+
+			myGroup.append('svg:image')
+				.attr('xlink:href', function(d,i){
+					return '../bandiere/flag_'+i+'.jpg'
+				})
+				.attr('width', 25)
+				.attr('height', 20)
+				.attr('transform' , function(d,i){
+					var s = 'translate('
+					temp = 30
+					for(j=0;j<i;j++){
+						temp += m_percountry[j]
+					}
+					temp+= d.values.total/2-5
+					s += mapx(temp) + ',42)'
+					return s
+				})
+
+				
+
+
+			/*	.text(function(d){
+							return d.key;
+						})
+						.attr('y', barY)
+						.style('opacity', 0) */
+
+			//prima barra di rettangoli: STATO (NUMERO MEDAGLIE)
+			myGroup.append('rect')
+				.attr('width', function(d,i){
+					return mapx(d.values.total)
+				})
+				.attr('height', 5)
+				.style('stroke', '#231F20')
+				.style('fill', '#E6E6E6')
+				.attr('transform' , function(d,i){
+					var s = 'translate('
+					temp = 30
+					for(j=0;j<i;j++){
+						temp += m_percountry[j]
+					}
+					s += mapx(temp) + ',50)'
+					return s
+				})
+
+
+			//seconda barra di rettangoli: medaglie d'oro
+			myGroup.append('rect')
+				.attr('width', function(d,i){
+					return mapx(d.values.gold)
+				})
+				.attr('height', 20)
+				.style('stroke', '#231F20')
+				.style('fill', '#CDA349')
+				.attr('transform' , function(d,i){
+					var s = 'translate('
+					temp = 30
+					for(j=0;j<i;j++){
+						temp += m_percountry[j]
+					}
+					s += mapx(temp) + ',72)'
+					return s
+				})
+
+			//seconda barra di rettangoli: medaglie di argento
+			myGroup.append('rect')
+				.attr('width', function(d,i){
+					return mapx(d.values.silver)
+				})
+				.attr('height', 20)
+				.style('stroke', '#231F20')
+				.style('fill', '#989498')
+				.attr('transform' , function(d,i){
+					var s = 'translate('
+					temp = 30
+					for(j=0;j<i;j++){
+						temp += m_percountry[j]
+					}
+					temp += d.values.gold
+					s += mapx(temp) + ',72)'
+					return s
+				})
+
+			//seconda barra di rettangoli: medaglie di bronzo
+			myGroup.append('rect')
+				.attr('width', function(d,i){
+					return mapx(d.values.bronze)
+				})
+				.attr('height', 20)
+				.style('stroke', '#231F20')
+				.style('fill', '#8C572C')
+				.attr('transform' , function(d,i){
+					var s = 'translate('
+					temp = 30
+					for(j=0;j<i;j++){
+						temp += m_percountry[j] 
+					}
+					temp += d.values.gold + d.values.silver
+					s += mapx(temp) + ',72)'
+					return s
+				})
+
+
+
+
+			//   ****** non ho idea di come creare un altro gruppo, cioe, lo creo ma non lo riesco a fare visualizzare..purtroppo per far vedere la barra sotto non so come fare con la stessa struttura..pensavo di usarne una diversa, ho creato un array chiamato sports che contiene come chiave l'elenco degli sport con il numero di ricorrenze..
+			// ***** vorrei riuscire a mettere tutto nella stessa struttura ma non riesco..e non so come fare! se riuscite illuminatemi please! :))
+
+			
+			var myGroup2 = d3.select('#sportsGroup').selectAll('rect')  //var myGroup = svg.selectAll('rect')
+				.data(rollup_data)
+				.enter()
+				.append('g')
+
+
+			//prima barra di rettangoli: STATO (NUMERO MEDAGLIE)
+			myGroup2.append('rect')
+				.attr('width', function(d,i){
+					return mapx(d.values.total)
+				})
+				.attr('height', 20)
+				.style('stroke', 'black')
+				.style('fill', 'white')
+				.attr('transform' , function(d,i){
+					var s = 'translate('
+					temp = 30
+					for(j=0;j<i;j++){
+						temp += m_percountry[j]
+					}
+					s += mapx(temp) + ',50)'
+					return s
+				})
+
+
+			//seconda barra di rettangoli: medaglie d'oro
+			myGroup2.append('rect')
+				.attr('width', function(d,i){
+					return mapx(d.values.gold)
+				})
+				.attr('height', 20)
+				.style('stroke', 'black')
+				.style('fill', 'white')
+				.attr('transform' , function(d,i){
+					var s = 'translate('
+					temp = 30
+					for(j=0;j<i;j++){
+						temp += m_percountry[j]
+					}
+					s += mapx(temp) + ',72)'
+					return s
+				})
+
+			//seconda barra di rettangoli: medaglie di argento
+			myGroup2.append('rect')
+				.attr('width', function(d,i){
+					return mapx(d.values.silver)
+				})
+				.attr('height', 20)
+				.style('stroke', 'black')
+				.style('fill', 'white')
+				.attr('transform' , function(d,i){
+					var s = 'translate('
+					temp = 30
+					for(j=0;j<i;j++){
+						temp += m_percountry[j]
+					}
+					temp += d.values.gold
+					s += mapx(temp) + ',72)'
+					return s
+				})
+
+			//seconda barra di rettangoli: medaglie di bronzo
+			myGroup2.append('rect')
+				.attr('width', function(d,i){
+					return mapx(d.values.bronze)
+				})
+				.attr('height', 20)
+				.style('stroke', 'black')
+				.style('fill', 'white')
+				.attr('transform' , function(d,i){
+					var s = 'translate('
+					temp = 30
+					for(j=0;j<i;j++){
+						temp += m_percountry[j] 
+					}
+					temp += d.values.gold + d.values.silver
+					s += mapx(temp) + ',72)'
+					return s
+				})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			/*var myGroup2 = d3.select('#sportsRect').selectAll('rect')
+				.data(sports)
+				.enter()
+				.append('g') 
+
+			
+			myGroup2.append('rect')
+				.attr('width', function(d,i){
+					return mapx(d.values.total)
+				})
+				.attr('class', '.sportsRect')
+				.attr('height', 20)
+				.style('stroke', 'black')
+				.style('fill', 'white')
+
+
+
+				/*.attr('transform' , function(d,i){
+					var s = 'translate('
+					temp = 30
+					for(j=0;j<i;j++){
+						temp += m_percountry[j]
+					}
+					s += mapx(temp) + ',50)'
+					return s
+				})*/	
+
+
+
+
+
+
+
+			/*var myGroup2 = svg.selectAll('circle')
+				.data(sports)
+				.enter()
+				.append('g') 
+				
+			var circle = svg.selectAll("circle")
+    				.data(sports).enter().append('g');
+				
+
+			svg.append('circle')
+				.attr('cx', 10)
+				.attr('cy',10)
+				.attr('r', 100)
+				.attr('transform', 'translate(280,300)');
+			*/	
+
+			//Barra in basso: Sport  --> faccio un altro gruppo oppure no??mi sa di si perche i dati sono diversi..
+			/*myGroup2.append('rect')
+				.attr('width', function(d,i){
+					return mapx(d.values.total)
+				})
+				.attr('height', 20)
+				.style('stroke', 'black')
+				.style('fill', 'white')
+				.attr('transform' , function(d,i){
+					var s = 'translate('
+					temp = 30
+					for(j=0;j<i;j++){
+						temp += m_percountry[j]
+					}
+					s += mapx(temp) + ',500)'
+					return s
+				}) 
+		*/
+
+				
+		})
+
+	</script>
+	</body>
+</html>
